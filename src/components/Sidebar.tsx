@@ -46,14 +46,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-[100vh] w-64 ${
+        className={`fixed top-0 left-0 min-h-screen w-64 ${
           isDark
             ? "bg-gray-800 border-r-gray-600"
             : "bg-white border-r-gray-200"
         } shadow-lg border-r z-50 flex flex-col
           transform ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0 lg:static lg:shadow-none lg:border-r
-          transition-transform duration-300 ease-in-out`}
+          transition-transform duration-300 ease-in-out overflow-y-auto`}
       >
         <div
           className={`flex-shrink-0 pt-4 px-4 pb-2 flex justify-between items-center ${
@@ -89,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <nav className="flex-1 px-4 py-2">
+        <nav className="flex-1 px-4 py-2 min-h-0 overflow-y-auto">
           <ul className="space-y-1">
             {navItems.map((item) => (
               <li key={item.name}>
