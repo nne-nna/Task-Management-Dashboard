@@ -96,14 +96,14 @@ const EventDetailModal: React.FC<EventDetailModalProps> = ({ event, onClose, onD
             className="px-4 py-2 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors duration-200 flex items-center gap-2"
             aria-label="Edit event"
           >
-            <Edit size={16} /> Edit Event
+            <Edit size={16} /> <p className='text-xs'>Edit Event</p>
           </button>
           <button
             onClick={() => onDelete(event.id)}
             className="px-4 py-2 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-colors duration-200 flex items-center gap-2"
             aria-label="Delete event"
           >
-            <Trash2 size={16} /> Delete Event
+            <Trash2 size={16} /> <p className='text-xs'>Delete Event</p>
           </button>
         </div>
       </div>
