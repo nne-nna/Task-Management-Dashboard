@@ -1,17 +1,19 @@
-**TaskFlow - Task Management Application** <br>
+# TaskFlow - Task Management Application
+
 TaskFlow is a responsive, React-based web application designed for efficient task management and scheduling. It allows users to create, edit, delete, and filter tasks, visualize task statistics, and manage events through an integrated calendar. The application supports light and dark themes, persists data in local storage, and features a drag-and-drop interface for task reordering.
+
 This project was developed as part of an assessment for a frontend role, showcasing proficiency in React, TypeScript, Tailwind CSS, and modern web development practices.
 
 ## Features
 
 - **Task Management**: Create, edit, delete, and mark tasks as completed or pending with priority levels (low, medium, high) and due dates.
-- **Calendar Integration**: View and manage tasks as events in day, week, or month views, with support for event categories (work, personal, breaks, meetings).
+- **Calendar Integration**: View and manage tasks as events in day, week, or month views, with support for event categories (work, personal, breaks, meetings). Clicking an event opens a modal for viewing, editing, or deleting, ensuring deliberate actions for deletion.
 - **Task Filtering and Search**: Filter tasks by status (all, pending, completed, overdue) and search by title or description.
 - **Task Statistics**: Visualize task completion status with a doughnut chart and summary cards.
 - **Theme Support**: Toggle between light and dark modes, with preferences saved in local storage.
-- **Responsive Design**: Optimized for both mobile and desktop devices, with a collapsible sidebar for mobile users.
+- **Responsive Design**: Optimized for both mobile and desktop devices, with a collapsible sidebar for mobile users and a compact event form for better screen fit.
 - **Drag-and-Drop**: Reorder tasks via drag-and-drop functionality with support for keyboard navigation and touch devices.
-- **Form Validation**: Client-side validation for task and event forms to ensure data integrity.
+- **Form Validation**: Client-side validation for task and event forms to ensure data integrity, with a compact event form design for improved usability on smaller screens.
 - **Local Storage**: Persist tasks and events in the browser's local storage for data retention.
 
 ## Setup Instructions
@@ -68,10 +70,10 @@ This project was developed as part of an assessment for a frontend role, showcas
    yarn build
    ```
 
-### Running the Application
+## Running the Application
 
-1. Open https://taskflowdashboard.vercel.app/ in your browser to access the application.
-2. Navigate to the Dashboard to manage tasks, Calendar to view events, Settings to configure preferences (no functionality added), or Help & Support for FAQs and contact information.
+- Open https://taskflowdashboard.vercel.app/ in your browser to access the application.
+- Navigate to the Dashboard to manage tasks, Calendar to view events, Settings to configure preferences (no functionality added), or Help & Support for FAQs and contact information.
 
 ## Architectural Decisions
 
@@ -133,19 +135,19 @@ This project was developed as part of an assessment for a frontend role, showcas
 
 ### 8. Calendar with Multiple Views
 
-**Decision**: Built a calendar component (Calendar.tsx) with day, week, and month views, syncing tasks as events.
+**Decision**: Built a calendar component (Calendar.tsx) with day, week, and month views, syncing tasks as events. Removed direct delete buttons from all views to prevent accidental deletions, requiring users to delete events via the event detail modal.
 
-**Reason**: Offers flexible event visualization, with tasks automatically mapped to events via useEffect. Category-based coloring improves clarity.
+**Reason**: Offers flexible event visualization, with tasks automatically mapped to events via useEffect. Category-based coloring improves clarity. Requiring modal interaction for deletions enhances user safety, especially on mobile devices where accidental taps could trigger unintended actions.
 
-**Impact**: Increases complexity due to dynamic rendering and event positioning logic but provides a robust scheduling feature.
+**Impact**: Increases complexity due to dynamic rendering and event positioning logic but provides a robust scheduling feature with improved usability and safety.
 
-### 9. Form Validation
+### 9. Form Validation and Compact Design
 
-**Decision**: Implemented client-side validation in TaskForm and EventForm with real-time feedback.
+**Decision**: Implemented client-side validation in TaskForm and EventForm with real-time feedback. Reduced the size of the EventForm to ensure it fits better on smaller screens.
 
-**Reason**: Ensures data integrity (e.g., required fields, valid dates, time constraints) before saving. Real-time validation improves user experience by providing immediate error feedback.
+**Reason**: Ensures data integrity (e.g., required fields, valid dates, time constraints) before saving. Real-time validation improves user experience by providing immediate error feedback. A compact EventForm enhances usability on mobile devices by reducing screen space usage.
 
-**Impact**: Enhances form usability but adds complexity to form components with state management for errors and validity.
+**Impact**: Enhances form usability but adds complexity to form components with state management for errors and validity. The compact design improves mobile experience but requires testing to ensure readability.
 
 ### 10. Responsive Design with Sidebar
 
@@ -213,6 +215,14 @@ This project was developed as part of an assessment for a frontend role, showcas
 
 **Cons**: Limited interactivity, cannot address user-specific queries, requires manual updates for new FAQs.
 
+### 8. Modal-Based Event Deletion vs. Direct Deletion
+
+**Trade-off**: Removed direct delete buttons from calendar views, requiring users to delete events via the event detail modal.
+
+**Pros**: Prevents accidental deletions, especially on mobile devices, by requiring deliberate action through the modal. Simplifies event interaction to a single click action (open modal) across all views.
+
+**Cons**: Adds an extra step for deleting events, which may slightly slow down the workflow for users who frequently delete events.
+
 ## Folder Structure
 
 ```
@@ -233,6 +243,8 @@ src/
 │   └── useLocalStorage.ts
 ├── Layout/
 │   └── DashboardLayout.tsx
+├── Modal/
+│   └── EventDetailModal.tsx
 ├── Pages/
 │   ├── Calendar.tsx
 │   ├── HelpAndSupportPage.tsx
@@ -262,9 +274,11 @@ src/
 - Implement real-time collaboration features for shared tasks.
 - Enhance calendar with drag-and-drop event rescheduling.
 - Optimize performance with memoization and lazy loading.
-- Add accessibility (a11y) improvements, such as ARIA labels and keyboard navigation.
+- Add accessibility (a11y) improvements, such as ARIA labels and enhanced keyboard navigation.
 - Implement task grouping and nested subtasks.
 - Add bulk operations for multiple task selection.
+- Consider adding a confirmation prompt for event deletions in the modal to further prevent accidental actions.
+- Explore long-press gestures for direct event actions (e.g., deletion) in the calendar views as an alternative to modal-based deletion.
 
 ## Notes
 
@@ -272,3 +286,5 @@ src/
 - The calendar uses a fixed date (2025-07-22) as the initial state for consistency in the assessment context.
 - The project is designed to be standalone, with all data stored in local storage to meet the assessment's frontend focus.
 - Drag-and-drop functionality is fully accessible and supports keyboard navigation and screen readers through @dnd-kit implementation.
+- The event form has been optimized for smaller screens with reduced width, padding, and font sizes to improve mobile usability.
+- Event deletion is restricted to the event detail modal to prevent accidental deletions, particularly on mobile devices.
