@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom'; 
+import { Outlet } from 'react-router-dom'; 
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
 import { useThemeContext } from '../context/ThemeContext';
@@ -7,10 +7,6 @@ import { useThemeContext } from '../context/ThemeContext';
 const DashboardLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const { isDark } = useThemeContext();
-  const location = useLocation(); 
-
-  const currentSearchParams = new URLSearchParams(location.search);
-  const currentFilter = (currentSearchParams.get('filter') || 'all') as 'all' | 'pending' | 'completed' | 'overdue';
 
   const toggleSidebar = (): void => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -25,7 +21,6 @@ const DashboardLayout: React.FC = () => {
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
-        activeFilter={currentFilter}
       />
 
       <div className="flex-1 flex flex-col">

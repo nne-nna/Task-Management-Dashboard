@@ -13,7 +13,6 @@ import { useThemeContext } from "../context/ThemeContext";
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  activeFilter: "all" | "pending" | "completed" | "overdue";
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
@@ -54,7 +53,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         } shadow-lg border-r z-50 flex flex-col
           transform ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0 lg:static lg:shadow-none lg:border-r
-          transition-transform duration-300 ease-in-out`}
+          transition-transform duration-300 ease-in-out overscroll-contain`}
       >
         <div
           className={`flex-shrink-0 pt-5 pl-5 pr-5 pb-0 flex justify-between items-center ${
@@ -90,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <nav className="flex-1 mt-8 px-4 overflow-y-auto overflow-x-hidden min-h-0">
+        <nav className="flex-1 mt-8 px-4 overflow-y-auto overflow-x-hidden min-h-0 overscroll-contain">
           <ul className="space-y-2">
             {navItems.map((item) => (
               <li key={item.name}>
