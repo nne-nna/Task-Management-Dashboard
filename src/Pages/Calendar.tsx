@@ -4,6 +4,7 @@ import { useThemeContext } from '../context/ThemeContext';
 import useLocalStorage from '../hooks/useLocalStorage';
 import type { Task } from '../types/task';
 import EventForm from '../components/EventForm';
+import EventDetailModal from '../Modal/EventDetailModal';
 
 interface CalendarEvent {
   id: string;
@@ -25,6 +26,8 @@ const Calendar: React.FC<CalendarPageProps> = () => {
   const [currentDate, setCurrentDate] = useState(new Date('2025-07-22T20:21:00+02:00')); 
   const [view, setView] = useState<'month' | 'week' | 'day'>('week');
   const [showEventForm, setShowEventForm] = useState(false);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
   useEffect(() => {
     const validCategories = ['work', 'personal', 'breaks', 'meetings'] as const;
@@ -154,11 +157,38 @@ const Calendar: React.FC<CalendarPageProps> = () => {
   };
 
   const handleSaveEvent = (event: CalendarEvent) => {
-    setEvents(prev => [...prev, event]);
+    setEvents(prev => {
+      const existingIndex = prev.findIndex(e => e.id === event.id);
+      if (existingIndex >= 0) {
+        const updatedEvents = [...prev];
+        updatedEvents[existingIndex] = event;
+        return updatedEvents;
+      } else {
+        return [...prev, event];
+      }
+    });
   };
 
   const handleDeleteEvent = (eventId: string) => {
     setEvents(prev => prev.filter(event => event.id !== eventId));
+    setShowEventModal(false);
+    setSelectedEvent(null);
+  };
+
+  const handleEditEvent = (event: CalendarEvent) => {
+    setSelectedEvent(event);
+    setShowEventForm(true);
+    setShowEventModal(false);
+  };
+
+  const handleEventClick = (event: CalendarEvent) => {
+    setSelectedEvent(event);
+    setShowEventModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowEventModal(false);
+    setSelectedEvent(null);
   };
 
   return (
@@ -178,6 +208,7 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                 else navigateDay('prev');
               }}
               className={`p-2 rounded-lg ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
+              aria-label="Previous"
             >
               <ChevronLeft size={20} />
             </button>
@@ -191,6 +222,7 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                 else navigateDay('next');
               }}
               className={`p-2 rounded-lg ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
+              aria-label="Next"
             >
               <ChevronRight size={20} />
             </button>
@@ -204,16 +236,21 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                   className={`px-3 py-1 rounded-md text-sm font-medium capitalize transition-colors ${
                     view === viewType ? 'bg-blue-500 text-white' : isDark ? 'text-gray-300 hover:text-white' : 'text-gray-600 hover:text-gray-900'
                   }`}
+                  aria-label={`Switch to ${viewType} view`}
                 >
                   {viewType}
                 </button>
               ))}
             </div>
             <button
-              onClick={() => setShowEventForm(true)}
+              onClick={() => {
+                setSelectedEvent(null);
+                setShowEventForm(true);
+              }}
               className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2"
+              aria-label="Add new event"
             >
-              <Plus size={16} /> <p className='text-xs '>Add Event</p>
+              <Plus size={16} /> <p className='text-xs'>Add Event</p>
             </button>
           </div>
         </div>
@@ -239,7 +276,7 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                     <div
                       key={`${dayIndex}-${time}`}
                       className={`relative min-h-[60px] border-b border-r ${isDark ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}
-                      style={{ height: '60px' }} // Fixed height per slot
+                      style={{ height: '60px' }}
                     >
                       {dayEvents.map((event) => {
                         const position = getEventPosition(event, dayEvents.filter(e => e.date === event.date && e.startTime <= event.endTime && e.endTime >= event.startTime));
@@ -251,12 +288,15 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                               key={event.id}
                               className={`absolute rounded px-2 py-1 text-xs border ${categoryColors[event.category]} cursor-pointer hover:shadow-md transition-shadow group`}
                               style={{
-                                top: 0, 
+                                top: 0,
                                 height: position.height,
                                 left: position.left,
                                 width: position.width,
                                 zIndex: dayEvents.findIndex(e => e.id === event.id) + 1
                               }}
+                              onClick={() => handleEventClick(event)}
+                              role="button"
+                              aria-label={`View details for ${event.title}`}
                             >
                               <div className="font-medium truncate">{formatTime(event.startTime)}</div>
                               <div className="truncate">{event.title}</div>
@@ -273,6 +313,7 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                                 }}
                                 className="absolute top-1 right-1 p-0.5 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                                 title="Delete event"
+                                aria-label="Delete event"
                               >
                                 <Trash2 size={12} />
                               </button>
@@ -298,7 +339,7 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                 <div className={`p-2 text-xs text-center border-b border-r ${isDark ? 'bg-gray-800 border-gray-600 text-gray-400' : 'bg-gray-50 border-gray-200 text-gray-500'}`}>{time}</div>
                 <div
                   className={`relative min-h-[60px] border-b border-r ${isDark ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-200 hover:bg-gray-50'} transition-colors`}
-                  style={{ height: '60px' }} 
+                  style={{ height: '60px' }}
                 >
                   {getEventsForDate(currentDate).map((event) => {
                     const position = getEventPosition(event, getEventsForDate(currentDate).filter(e => e.date === event.date && e.startTime <= event.endTime && e.endTime >= event.startTime));
@@ -310,12 +351,15 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                           key={event.id}
                           className={`absolute rounded px-2 py-1 text-xs border ${categoryColors[event.category]} cursor-pointer hover:shadow-md transition-shadow group`}
                           style={{
-                            top: 0, 
+                            top: 0,
                             height: position.height,
                             left: position.left,
                             width: position.width,
                             zIndex: getEventsForDate(currentDate).findIndex(e => e.id === event.id) + 1
                           }}
+                          onClick={() => handleEventClick(event)}
+                          role="button"
+                          aria-label={`View details for ${event.title}`}
                         >
                           <div className="font-medium truncate">{formatTime(event.startTime)}</div>
                           <div className="truncate">{event.title}</div>
@@ -332,6 +376,7 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                             }}
                             className="absolute top-1 right-1 p-0.5 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                             title="Delete event"
+                            aria-label="Delete event"
                           >
                             <Trash2 size={12} />
                           </button>
@@ -365,17 +410,24 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                 {date && getEventsForDate(date).length > 0 && (
                   <div className="mt-1 text-xs space-y-1">
                     {getEventsForDate(date).slice(0, 2).map(event => (
-                      <div key={event.id} className={`flex justify-between items-center truncate ${categoryColors[event.category]} group p-1 rounded`}>
-                        <span className="truncate">{event.title}</span>
+                      <div
+                        key={event.id}
+                        className={`flex justify-between items-center truncate ${categoryColors[event.category]} group p-2 rounded cursor-pointer`}
+                        onClick={() => handleEventClick(event)}
+                        role="button"
+                        aria-label={`View details for ${event.title}`}
+                      >
+                        <span className="truncate flex-1">{event.title}</span>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteEvent(event.id);
                           }}
-                          className="ml-1 p-0.5 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                          className="ml-2 p-1 rounded-full text-white hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                           title="Delete event"
+                          aria-label="Delete event"
                         >
-                          <Trash2 size={10} />
+                          <Trash2 size={12} />
                         </button>
                       </div>
                     ))}
@@ -416,7 +468,23 @@ const Calendar: React.FC<CalendarPageProps> = () => {
       </div>
 
       {showEventForm && (
-        <EventForm onSave={handleSaveEvent} onCancel={() => setShowEventForm(false)} />
+        <EventForm
+          onSave={handleSaveEvent}
+          onCancel={() => {
+            setShowEventForm(false);
+            setSelectedEvent(null);
+          }}
+          initialData={selectedEvent ?? undefined}
+        />
+      )}
+
+      {showEventModal && selectedEvent && (
+        <EventDetailModal
+          event={selectedEvent}
+          onClose={handleCloseModal}
+          onDelete={handleDeleteEvent}
+          onEdit={handleEditEvent}
+        />
       )}
     </div>
   );
