@@ -1,6 +1,22 @@
 import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+
 import TaskForm from '../components/TaskForm';
 import TaskCard from '../components/TaskCard';
 import FilterBar from '../components/FilterBar';
@@ -26,7 +42,17 @@ export default function TaskManagementDashboard(): React.JSX.Element {
   const [showForm, setShowForm] = useState<boolean>(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [draggedTask, setDraggedTask] = useState<Task | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, 
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const handleFilterChange = (newFilter: 'all' | 'pending' | 'completed' | 'overdue'): void => {
     const newParams = new URLSearchParams(queryParams);
@@ -55,7 +81,7 @@ export default function TaskManagementDashboard(): React.JSX.Element {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(task =>
         task.title.toLowerCase().includes(searchLower) ||
-        (task.description?.toLowerCase() || '').includes(searchLower) // Handle undefined description
+        (task.description?.toLowerCase() || '').includes(searchLower)
       );
     }
 
@@ -119,36 +145,17 @@ export default function TaskManagementDashboard(): React.JSX.Element {
     setEditingTask(null);
   };
 
-  const handleDragStart = (task: Task): void => {
-    setDraggedTask(task);
-  };
+  const handleDragEnd = (event: DragEndEvent): void => {
+    const { active, over } = event;
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>): void => {
-    e.preventDefault();
-    e.currentTarget.classList.add('border-blue-500', 'border-dashed');
-  };
+    if (active.id !== over?.id) {
+      setTasks((tasks) => {
+        const oldIndex = tasks.findIndex(task => task.id === active.id);
+        const newIndex = tasks.findIndex(task => task.id === over?.id);
 
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>): void => {
-    e.currentTarget.classList.remove('border-blue-500', 'border-dashed');
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetTask: Task): void => {
-    e.preventDefault();
-    e.currentTarget.classList.remove('border-blue-500', 'border-dashed'); 
-    if (!draggedTask || draggedTask.id === targetTask.id) {
-      setDraggedTask(null);
-      return;
+        return arrayMove(tasks, oldIndex, newIndex);
+      });
     }
-
-    const newTasks = [...tasks]; 
-    const draggedIndex = newTasks.findIndex((task: Task) => task.id === draggedTask.id);
-    const targetIndex = newTasks.findIndex((task: Task) => task.id === targetTask.id);
-
-    const [removed] = newTasks.splice(draggedIndex, 1);
-    newTasks.splice(targetIndex, 0, removed);
-
-    setTasks(newTasks);
-    setDraggedTask(null);
   };
 
   return (
@@ -190,23 +197,26 @@ export default function TaskManagementDashboard(): React.JSX.Element {
         {displayTasks.length === 0 ? (
           <EmptyState filter={activeFilter} />
         ) : (
-          displayTasks.map((task: Task) => ( 
-            <div
-              key={task.id}
-              onDragOver={handleDragOver}
-              onDrop={(e: React.DragEvent<HTMLDivElement>) => handleDrop(e, task)}
-              onDragLeave={handleDragLeave} 
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext 
+              items={displayTasks.map(task => task.id)} 
+              strategy={verticalListSortingStrategy}
             >
-              <TaskCard
-                task={task}
-                onEdit={handleEditTask}
-                onDelete={handleDeleteTask}
-                onToggleStatus={handleToggleStatus}
-                onDragStart={handleDragStart}
-                isDragging={draggedTask?.id === task.id}
-              />
-            </div>
-          ))
+              {displayTasks.map((task: Task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  onEdit={handleEditTask}
+                  onDelete={handleDeleteTask}
+                  onToggleStatus={handleToggleStatus}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
         )}
       </div>
 

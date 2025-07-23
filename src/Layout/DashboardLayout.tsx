@@ -2,16 +2,26 @@ import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom'; 
 import Sidebar from '../components/Sidebar';
 import Navbar from '../components/Navbar';
+import { useThemeContext } from '../context/ThemeContext';
 
 const DashboardLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const { isDark } = useThemeContext();
   const location = useLocation(); 
 
   const currentSearchParams = new URLSearchParams(location.search);
   const currentFilter = (currentSearchParams.get('filter') || 'all') as 'all' | 'pending' | 'completed' | 'overdue';
 
+  const toggleSidebar = (): void => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
-    <div className="flex h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white transition-colors duration-200 overflow-hidden">
+    <div className={`flex h-screen transition-colors duration-200 overflow-hidden ${
+      isDark 
+        ? 'bg-gray-900 text-white' 
+        : 'bg-gray-50 text-gray-900'
+    }`}>
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
@@ -19,7 +29,7 @@ const DashboardLayout: React.FC = () => {
       />
 
       <div className="flex-1 flex flex-col">
-        <Navbar onMenuClick={() => setIsSidebarOpen(true)} />
+        <Navbar onMenuClick={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
         <main className="flex-1 overflow-y-auto">
           <Outlet />

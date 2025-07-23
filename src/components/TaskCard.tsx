@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Edit2, Trash2, Check, AlertCircle, Calendar } from 'lucide-react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import type { Task } from '../types/task';
 import { isOverdue, formatDate, getPriorityColor } from '../utils/taskUtils';
 import { useThemeContext } from '../context/ThemeContext';
@@ -9,13 +11,25 @@ export interface TaskCardProps {
   onEdit: (task: Task) => void;
   onDelete: (taskId: string) => void;
   onToggleStatus: (taskId: string) => void;
-  onDragStart: (task: Task) => void;
-  isDragging: boolean;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete, onToggleStatus, onDragStart, isDragging }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete, onToggleStatus }) => {
   const { isDark } = useThemeContext();
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
   const handleDelete = async (): Promise<void> => {
     setIsDeleting(true);
@@ -30,18 +44,20 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete, onToggleSta
   };
 
   const cardClasses = `
-    rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 border cursor-grab
+    rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-200 border cursor-grab active:cursor-grabbing
     ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}
-    ${isDragging ? 'opacity-50 scale-95' : ''}
+    ${isDragging ? 'opacity-50 scale-95 shadow-lg' : ''}
     ${task.status === 'completed' ? 'opacity-75' : ''}
     ${isOverdue(task.dueDate) && task.status !== 'completed' ? 'border-l-4 border-l-red-500' : ''}
   `;
 
   return (
     <div
+      ref={setNodeRef}
+      style={style}
       className={cardClasses}
-      draggable
-      onDragStart={() => onDragStart(task)}
+      {...attributes}
+      {...listeners}
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1 min-w-0">
@@ -76,6 +92,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete, onToggleSta
                 : 'text-gray-400 hover:bg-gray-100 hover:text-green-500'
             }`}
             title={task.status === 'completed' ? 'Mark as pending' : 'Mark as completed'}
+            style={{ touchAction: 'manipulation' }} 
           >
             <Check size={16} />
           </button>
@@ -87,6 +104,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete, onToggleSta
                 : 'text-gray-400 hover:text-blue-500 hover:bg-blue-50'
             }`}
             title="Edit task"
+            style={{ touchAction: 'manipulation' }} 
           >
             <Edit2 size={16} />
           </button>
@@ -99,6 +117,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete, onToggleSta
                 : 'text-gray-400 hover:text-red-500 hover:bg-red-50'
             }`}
             title="Delete task"
+            style={{ touchAction: 'manipulation' }} 
           >
             {isDeleting ? (
               <div

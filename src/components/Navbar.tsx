@@ -1,13 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Menu, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { useThemeContext } from "../context/ThemeContext";
 
 interface NavbarProps {
   onMenuClick: () => void;
+  isSidebarOpen: boolean;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
+const Navbar: React.FC<NavbarProps> = ({ onMenuClick, isSidebarOpen }) => {
   const { isDark, toggleTheme } = useThemeContext();
 
   return (
@@ -20,14 +21,14 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
         <div className="flex items-center">
           <button
             onClick={onMenuClick}
-            className={`lg:hidden mr-4 ${
+            className={`lg:hidden mr-6 p-1 rounded-lg transition-all duration-200 ${
               isDark
-                ? "text-gray-400 hover:text-gray-200"
-                : "text-gray-500 hover:text-gray-700"
+                ? "text-gray-400 hover:text-gray-200 hover:bg-gray-700"
+                : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
             }`}
-            aria-label="Toggle sidebar"
+            aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
           >
-            <Menu size={24} />
+            {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
           <Link
             to="/dashboard"

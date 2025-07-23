@@ -211,9 +211,9 @@ const Calendar: React.FC<CalendarPageProps> = () => {
             </div>
             <button
               onClick={() => setShowEventForm(true)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2.5 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2"
             >
-              <Plus size={16} /> Add Event
+              <Plus size={16} /> <p className='text-xs '>Add Event</p>
             </button>
           </div>
         </div>

@@ -4,7 +4,7 @@ import {
   Calendar,
   Settings,
   HelpCircle,
-  Menu,
+  X,
   BookOpenCheck,
   LayoutDashboard,
 } from "lucide-react";
@@ -57,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           transition-transform duration-300 ease-in-out`}
       >
         <div
-          className={`flex-shrink-0 pt-5 pl-5 pr-5 pb-0 gap-2 flex ${
+          className={`flex-shrink-0 pt-5 pl-5 pr-5 pb-0 flex justify-between items-center ${
             isDark ? "border-gray-600" : "border-gray-200"
           }`}
         >
@@ -79,17 +79,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className={`lg:hidden ${
+            className={`lg:hidden p-1 rounded-lg transition-colors duration-200 ${
               isDark
-                ? "text-gray-400 hover:text-gray-200"
-                : "text-gray-500 hover:text-gray-700"
+                ? "text-gray-400 hover:text-gray-200 hover:bg-gray-700"
+                : "text-gray-500 hover:text-gray-700 hover:bg-gray-100"
             }`}
+            aria-label="Close sidebar"
           >
-            <Menu size={24} />
+            <X size={20} />
           </button>
         </div>
 
-        <nav className="flex-1 mt-8 px-4 overflow-hidden">
+        <nav className="flex-1 mt-8 px-4 overflow-y-auto overflow-x-hidden min-h-0">
           <ul className="space-y-2">
             {navItems.map((item) => (
               <li key={item.name}>
