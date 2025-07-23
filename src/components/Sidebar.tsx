@@ -46,17 +46,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       )}
 
       <aside
-        className={`fixed top-0 left-0 h-screen w-64 ${
+        className={`fixed top-0 left-0 h-[100vh] w-64 ${
           isDark
             ? "bg-gray-800 border-r-gray-600"
             : "bg-white border-r-gray-200"
         } shadow-lg border-r z-50 flex flex-col
           transform ${isOpen ? "translate-x-0" : "-translate-x-full"}
           lg:translate-x-0 lg:static lg:shadow-none lg:border-r
-          transition-transform duration-300 ease-in-out overscroll-contain`}
+          transition-transform duration-300 ease-in-out`}
       >
         <div
-          className={`flex-shrink-0 pt-5 pl-5 pr-5 pb-0 flex justify-between items-center ${
+          className={`flex-shrink-0 pt-4 px-4 pb-2 flex justify-between items-center ${
             isDark ? "border-gray-600" : "border-gray-200"
           }`}
         >
@@ -89,14 +89,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           </button>
         </div>
 
-        <nav className="flex-1 mt-8 px-4 overflow-y-auto overflow-x-hidden min-h-0 overscroll-contain">
-          <ul className="space-y-2">
+        <nav className="flex-1 px-4 py-2">
+          <ul className="space-y-1">
             {navItems.map((item) => (
               <li key={item.name}>
                 <Link
                   to={item.path}
                   onClick={onClose}
-                  className={`flex items-center w-full px-4 py-3 rounded-lg text-left transition-colors duration-200 ${
+                  className={`flex items-center w-full px-4 py-2 rounded-lg text-left transition-colors duration-200 ${
                     location.pathname === item.pathMatch ||
                     location.pathname === item.path
                       ? "bg-blue-500 text-white shadow-md"
@@ -114,11 +114,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </nav>
 
         <div
-          className={`flex-shrink-0 p-4 border-t ${
+          className={`flex-shrink-0 px-4 py-2 border-t ${
             isDark ? "border-gray-600" : "border-gray-200"
           }`}
         >
-          <ul className="space-y-2">
+          <ul className="space-y-1">
             <li>
               <Link
                 to="/settings"
