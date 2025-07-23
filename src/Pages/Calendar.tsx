@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Users, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Users } from 'lucide-react';
 import { useThemeContext } from '../context/ThemeContext';
 import useLocalStorage from '../hooks/useLocalStorage';
 import type { Task } from '../types/task';
@@ -286,7 +286,7 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                           return (
                             <div
                               key={event.id}
-                              className={`absolute rounded px-2 py-1 text-xs border ${categoryColors[event.category]} cursor-pointer hover:shadow-md transition-shadow group`}
+                              className={`absolute rounded px-2 py-1 text-xs border ${categoryColors[event.category]} cursor-pointer hover:shadow-md transition-shadow`}
                               style={{
                                 top: 0,
                                 height: position.height,
@@ -306,17 +306,6 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                                   <span className="truncate">{event.attendees.length}</span>
                                 </div>
                               )}
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteEvent(event.id);
-                                }}
-                                className="absolute top-1 right-1 p-0.5 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                                title="Delete event"
-                                aria-label="Delete event"
-                              >
-                                <Trash2 size={12} />
-                              </button>
                             </div>
                           );
                         }
@@ -349,7 +338,7 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                       return (
                         <div
                           key={event.id}
-                          className={`absolute rounded px-2 py-1 text-xs border ${categoryColors[event.category]} cursor-pointer hover:shadow-md transition-shadow group`}
+                          className={`absolute rounded px-2 py-1 text-xs border ${categoryColors[event.category]} cursor-pointer hover:shadow-md transition-shadow`}
                           style={{
                             top: 0,
                             height: position.height,
@@ -369,17 +358,6 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                               <span className="truncate">{event.attendees.length}</span>
                             </div>
                           )}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteEvent(event.id);
-                            }}
-                            className="absolute top-1 right-1 p-0.5 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                            title="Delete event"
-                            aria-label="Delete event"
-                          >
-                            <Trash2 size={12} />
-                          </button>
                         </div>
                       );
                     }
@@ -412,23 +390,12 @@ const Calendar: React.FC<CalendarPageProps> = () => {
                     {getEventsForDate(date).slice(0, 2).map(event => (
                       <div
                         key={event.id}
-                        className={`flex justify-between items-center truncate ${categoryColors[event.category]} group p-2 rounded cursor-pointer`}
+                        className={`p-2 rounded cursor-pointer ${categoryColors[event.category]}`}
                         onClick={() => handleEventClick(event)}
                         role="button"
                         aria-label={`View details for ${event.title}`}
                       >
-                        <span className="truncate flex-1">{event.title}</span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteEvent(event.id);
-                          }}
-                          className="ml-2 p-1 rounded-full text-white hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                          title="Delete event"
-                          aria-label="Delete event"
-                        >
-                          <Trash2 size={12} />
-                        </button>
+                        <span className="truncate">{event.title}</span>
                       </div>
                     ))}
                     {getEventsForDate(date).length > 2 && (
